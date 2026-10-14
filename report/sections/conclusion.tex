@@ -1,0 +1,46 @@
+This study evaluates one-hour-ahead Bitcoin volatility
+forecasts using five-minute BTCUSDT USD-margined perpetual
+futures data from 2022 to 2025. Hourly realized variance is
+forecast using a persistence benchmark, AR(24), Fixed HAR-X,
+and TVP-HAR-X within a chronological
+training--validation--test design.
+
+The results show that multi-horizon volatility and current
+market activity provide useful predictive information beyond
+both persistence and a conventional autoregression. On the
+2025 test sample, Fixed HAR-X reduces QLIKE from \(0.5054\)
+for AR(24) to \(0.4764\), an improvement of approximately
+\(5.75\%\). Trading activity contributes the strongest
+incremental signal among the additional HAR-X predictors and
+remains positively associated with next-hour volatility
+throughout the validation period.
+
+Allowing coefficients to vary over time produces a more
+qualified result. TVP-HAR-X achieves the lowest test MAE and
+RMSE, at \(0.5901\) and \(0.7734\), respectively. Relative to
+Fixed HAR-X, these values correspond to improvements of
+approximately \(1.33\%\) in absolute error and \(1.87\%\) in
+squared error. Both differences are statistically significant
+under the HAC loss-differential tests.
+
+Fixed HAR-X nevertheless records the lowest test QLIKE,
+at \(0.4764\), compared with \(0.4800\) for TVP-HAR-X. The
+one-sided test provides no evidence that parameter variation
+improves the pre-specified primary loss. Coefficient adaptation
+therefore improves average log-scale accuracy but does not
+deliver a uniform advantage under variance-scale evaluation.
+
+The evidence supports two main conclusions. First,
+short-horizon Bitcoin volatility is meaningfully predictable
+when recent volatility is represented across several horizons
+and combined with trading activity. Second, the value of
+time-varying coefficients depends on the forecast objective
+and market period. Fixed HAR-X provides the strongest
+performance under QLIKE, while TVP-HAR-X offers modest gains
+in MAE and RMSE and additional information about changes in
+predictor importance.
+
+These findings are specific to one contract, exchange, and
+forecast horizon. Broader conclusions require evaluation
+across additional markets, horizons, and richer
+microstructure data.

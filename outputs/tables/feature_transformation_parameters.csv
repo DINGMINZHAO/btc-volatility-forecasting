@@ -1,0 +1,2 @@
+feature,transformation,parameter_name,parameter_value,estimated_from_split,estimated_from_model_ready_only
+downside_semivariance,log1p(raw_value / training_positive_median),training_positive_median,5.262435892894065e-06,train,True

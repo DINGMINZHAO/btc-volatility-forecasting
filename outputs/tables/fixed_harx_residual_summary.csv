@@ -1,0 +1,2 @@
+continuous_segment_start,continuous_segment_end,n_residuals,residual_mean,residual_std,residual_lag1_autocorrelation,durbin_watson
+2022-06-04 18:00:00+00:00,2023-09-12 07:00:00+00:00,11150,-0.03630728788450181,0.8997061058005569,-0.006010908354377848,2.0087159878441194

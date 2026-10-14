@@ -1,0 +1,157 @@
+\documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% Packages
+% --------------------------------------------------
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\usepackage[round,authoryear]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% Figures are stored in outputs/figures
+\graphicspath{
+  {../outputs/figures/}
+}
+
+% --------------------------------------------------
+% Document information
+% --------------------------------------------------
+
+\title{
+One-Hour-Ahead Bitcoin Volatility Forecasting with
+Multi-Horizon Volatility, Market Activity, and
+Time-Varying Parameters
+}
+
+\author{Ding Minzhao}
+\date{July 2026}
+
+% --------------------------------------------------
+% Document
+% --------------------------------------------------
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+This study evaluates one-hour-ahead Bitcoin volatility
+forecasts using five-minute BTCUSDT USD-margined perpetual
+futures data from January 2022 to December 2025. Hourly
+realized variance is forecast using four models: a persistence
+benchmark, an AR(24) model, a fixed-parameter HAR-X model, and
+a time-varying parameter HAR-X state-space model. Forecast
+performance is assessed through a chronological
+training--validation--test design using MAE, RMSE, and QLIKE.
+
+On the 2025 test sample, Fixed HAR-X achieves the lowest
+QLIKE, while TVP-HAR-X records the lowest MAE and RMSE. The
+results show that multi-horizon volatility components and
+trading activity improve forecast accuracy relative to both
+persistence and AR(24). Time-varying coefficients provide
+modest gains in log-scale forecast accuracy, whereas the fixed
+HAR-X specification performs best under variance-scale loss.
+The value of parameter adaptation therefore depends on the
+forecasting objective and evaluation criterion.
+
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+% --------------------------------------------------
+% Main sections
+% --------------------------------------------------
+
+\section{Introduction}
+\label{sec:introduction}
+\input{sections/introduction}
+
+\section{Data and Variable Construction}
+\label{sec:data}
+\input{sections/data}
+
+\section{Forecasting Design}
+\label{sec:forecasting-design}
+\input{sections/forecasting_design}
+
+\section{Methodology}
+\label{sec:methodology}
+\input{sections/methodology}
+
+\section{Empirical Results}
+\label{sec:results}
+\input{sections/results}
+
+\section{Discussion}
+\label{sec:discussion}
+\input{sections/discussion}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{sections/conclusion}
+
+% --------------------------------------------------
+% Acknowledgements
+% --------------------------------------------------
+
+\clearpage
+\section*{Acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements}
+
+The author used ChatGPT, developed by OpenAI, as an auxiliary
+tool during the preparation of this report. In particular,
+ChatGPT assisted with the preparation of the Abstract and
+Appendix, as well as the initial development of the Python
+scripts whose filenames begin with \texttt{download},
+\texttt{extract}, and \texttt{inspect}. The remaining report
+content was written independently by the author, with
+AI-generated suggestions used only as references or sources of
+inspiration. All empirical results, numerical values, model
+interpretations, and final conclusions were checked by the
+author, who takes full responsibility for the content of the
+report. ChatGPT was also used to improve the language and clarity of the main text of this paper.
+
+% --------------------------------------------------
+% References
+% --------------------------------------------------
+
+\clearpage
+\addcontentsline{toc}{section}{References}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+% --------------------------------------------------
+% Appendix
+% --------------------------------------------------
+
+\clearpage
+\appendix
+
+\section{Reproducibility and Additional Results}
+\label{sec:appendix}
+\input{sections/appendix}
+
+\end{document}

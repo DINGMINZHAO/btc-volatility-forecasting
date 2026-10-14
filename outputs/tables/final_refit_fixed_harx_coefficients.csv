@@ -1,0 +1,9 @@
+model,term,coefficient,estimated_from
+Fixed HAR-X,const,-11.272765588275227,train_and_validation
+Fixed HAR-X,z_har_1h,0.25340625353517404,train_and_validation
+Fixed HAR-X,z_har_6h,0.26157228308406044,train_and_validation
+Fixed HAR-X,z_har_24h,0.23313491621609453,train_and_validation
+Fixed HAR-X,z_har_168h,0.1215483485557681,train_and_validation
+Fixed HAR-X,z_scaled_log_downside_semivariance,-0.002352375095869663,train_and_validation
+Fixed HAR-X,z_log1p_number_of_trades,0.3593628157071302,train_and_validation
+Fixed HAR-X,z_aggressive_buy_proxy,-0.010813267703936959,train_and_validation

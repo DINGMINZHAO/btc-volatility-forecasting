@@ -1,0 +1,94 @@
+Bitcoin trades continuously and is characterized by pronounced
+and rapidly changing volatility. Reliable short-horizon
+volatility forecasts are relevant to risk management, position
+sizing, derivatives pricing, and intraday trading decisions.
+Previous studies show that high-frequency realized-volatility
+measures can support Bitcoin volatility forecasting, while
+jumps and structural breaks may materially affect predictive
+performance \citep{bergsli2022,shen2020}. These features
+motivate models that capture persistent volatility dynamics
+and allow forecasting relationships to evolve over time.
+
+High-frequency returns provide a direct basis for measuring
+short-term price variation. Realized variance aggregates
+squared intraday returns and approximates the variation
+accumulated over a specified interval \citep{andersen2003}.
+This study constructs hourly realized variance from
+five-minute returns and uses its logarithm as the forecasting
+target. The resulting measure retains substantially more
+intraday information than volatility proxies based on a single
+hourly or daily return.
+
+Autoregressive models provide a natural benchmark because
+volatility is strongly persistent. However, a fixed collection
+of individual lags may represent multi-scale dependence
+inefficiently. The heterogeneous autoregressive model addresses
+this issue by combining realized-volatility components measured
+over different horizons \citep{corsi2009}. The specification
+used here adapts that framework to hourly data through
+one-hour, six-hour, daily, and weekly volatility components.
+
+The analysis also considers whether current market activity
+contains predictive information beyond lagged volatility. The
+mixture-of-distributions hypothesis links trading intensity and
+price variability through the arrival of information
+\citep{clark1973}, while empirical evidence documents a close
+relationship between transaction counts and volatility
+\citep{jones1994}. Three additional predictors are therefore
+included: downside realized semivariance, the number of trades,
+and an aggressive-buying proxy. Downside realized
+semivariance isolates the contribution of negative intraday
+returns to total realized variation
+\citep{barndorffnielsen2010}.
+
+A fixed-parameter model imposes a constant relationship between
+these predictors and future volatility. Such an assumption may
+be restrictive in cryptocurrency markets, where participation,
+liquidity, and volatility conditions can change substantially
+over time \citep{shen2020}. To accommodate gradual parameter
+variation, this study estimates a time-varying parameter HAR-X
+model in state-space form. The coefficients follow random-walk
+state equations and are updated sequentially through the
+Kalman filter \citep{kalman1960,durbin2012}.
+
+The empirical analysis uses five-minute BTCUSDT
+USD-margined perpetual futures data from January 2022 to
+December 2025. Four forecasting models are compared: a
+persistence benchmark, AR(24), Fixed HAR-X, and TVP-HAR-X.
+The sample is divided chronologically into training,
+validation, and final test periods. Preprocessing parameters
+and model specifications are determined using the training and
+validation samples, and the 2025 test sample is reserved for a
+single final evaluation.
+
+The study addresses two questions. First, do multi-horizon
+volatility components and high-frequency market activity
+improve one-hour-ahead forecasts relative to persistence and
+AR(24)? Second, does coefficient variation provide additional
+predictive value beyond a fixed-parameter HAR-X model using the
+same information set?
+
+The results show that both HAR-X specifications substantially
+outperform persistence and AR(24). Fixed HAR-X achieves the
+lowest test QLIKE, while TVP-HAR-X records the lowest MAE and
+RMSE. Trading activity contributes the clearest incremental
+information among the additional predictors. Coefficient
+variation improves average forecast accuracy on the log scale,
+although it does not improve the primary variance-scale loss.
+
+This study makes three contributions. It evaluates the proposed
+models against both persistence and a strong autoregressive
+benchmark; it combines multi-horizon realized volatility with
+hourly market-activity variables; and it compares fixed and
+time-varying coefficients using an identical predictor set.
+The last comparison isolates the forecasting value of parameter
+adaptation from differences in observable information.
+
+The remainder of the report is organized as follows.
+Section~\ref{sec:data} describes the data and variable
+construction. Section~\ref{sec:forecasting-design} presents the
+forecasting design and evaluation criteria.
+Section~\ref{sec:methodology} introduces the four models.
+Section~\ref{sec:results} reports the empirical results, and
+Section~\ref{sec:discussion} discusses their interpretation
+and limitations. Section~\ref{sec:conclusion} concludes.

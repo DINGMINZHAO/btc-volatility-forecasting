@@ -1,0 +1,8 @@
+raw_feature,standardized_feature,training_mean,training_std_ddof_0,estimated_from_split,estimated_from_model_ready_only
+har_1h,z_har_1h,-11.284588219609827,1.400245090079059,train,True
+har_6h,z_har_6h,-11.284759921287716,1.1798112006609378,train,True
+har_24h,z_har_24h,-11.283944135285212,1.0424637079459254,train,True
+har_168h,z_har_168h,-11.279725410000156,0.8608140251657966,train,True
+scaled_log_downside_semivariance,z_scaled_log_downside_semivariance,0.9309263530832337,0.8260909685541974,train,True
+log1p_number_of_trades,z_log1p_number_of_trades,11.653971823449654,0.7364237471688836,train,True
+aggressive_buy_proxy,z_aggressive_buy_proxy,-0.0013361443016540078,0.08173539580713678,train,True

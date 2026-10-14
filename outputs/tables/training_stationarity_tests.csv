@@ -1,0 +1,3 @@
+test,null_hypothesis,statistic,p_value,lags,n_observations,decision_at_5_percent
+ADF,unit root / nonstationary,-8.018620912704616,2.1056087229916204e-12,40,11277,reject unit root
+KPSS,level stationary,5.90133836122704,0.01,57,11318,reject level stationarity

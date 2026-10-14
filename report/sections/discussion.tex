@@ -1,0 +1,393 @@
+\subsection{Interpretation of the Main Result}
+
+The final test results produce different rankings across the
+three loss functions. TVP-HAR-X achieves the lowest MAE and
+RMSE on the log realized-variance scale, whereas Fixed HAR-X
+achieves the lowest QLIKE on the original variance scale.
+
+MAE and RMSE evaluate errors in
+\(y_t=\log(RV_t)\). MAE summarizes the typical absolute
+deviation, while RMSE assigns greater weight to large
+log-scale errors.
+
+QLIKE evaluates the implied variance forecast
+\(\widehat{RV}_t=\exp(\widehat{y}_t)\). Its loss depends on the
+ratio \(RV_t/\widehat{RV}_t\), making it particularly sensitive
+to substantial underprediction during high-volatility periods
+\citep{patton2011}. A model may therefore reduce average
+log-scale errors while recording a higher QLIKE because of a
+small number of unfavorable variance forecasts.
+
+The test results suggest that coefficient adaptation improves
+the typical accuracy of log-volatility forecasts. Fixed HAR-X,
+however, provides slightly better performance under the
+variance-scale loss. The empirical value of parameter
+variation consequently depends on the forecasting objective.
+
+\subsection{Validation and Test Performance}
+
+TVP-HAR-X reduces validation QLIKE by approximately \(4.30\%\)
+relative to Fixed HAR-X, but its test QLIKE is \(0.76\%\)
+higher. This change in ranking illustrates the importance of
+retaining a separate final test period.
+
+Fixed HAR-X estimates a single coefficient vector from the
+development sample and produces relatively stable forecasts.
+TVP-HAR-X introduces gradual coefficient movement, reducing
+bias when predictive relationships change while adding
+state-estimation uncertainty.
+
+The relative performance of the two specifications can be
+understood as a trade-off between adaptation and estimation
+uncertainty. During validation, parameter variation improves
+all three losses. During the test period, it continues to
+reduce MAE and RMSE, but the gain is insufficient to lower
+QLIKE.
+
+The difference across years also indicates that forecast-model
+rankings are sensitive to market conditions. Chronological
+validation is therefore more informative than a random split
+for this application.
+
+\subsection{Incremental Value of the HAR-X Information Set}
+
+The most substantial model improvement occurs between AR(24)
+and Fixed HAR-X. On the final test sample, Fixed HAR-X reduces
+QLIKE by approximately \(5.75\%\) relative to AR(24).
+
+AR(24) is a demanding benchmark because it estimates a
+separate coefficient for each of the previous 24 hourly
+volatility observations. The HAR-X improvement therefore
+provides evidence that the structured predictor set contains
+information beyond an unrestricted one-day lag specification.
+
+The HAR variables extend the information set to the preceding
+week without requiring 168 individual lag coefficients. This
+multi-horizon representation follows the HAR framework of
+\citet{corsi2009} and provides a parsimonious description of
+persistent volatility.
+
+HAR-X also incorporates current market activity. Among the
+additional variables, log trade count displays the strongest
+and most stable association with next-hour volatility. The
+forecasting information set thus combines recent volatility,
+longer-horizon volatility conditions, and current trading
+activity.
+
+\subsection{Interpretation of Trading Activity}
+
+Trading activity is the most informative additional predictor
+in both HAR-X specifications. In the fixed model, its
+standardized coefficient is \(0.3379\), with a HAC
+\(p\)-value below \(0.001\). During validation, its
+time-varying coefficient remains positive and ranges from
+approximately \(0.441\) to \(0.651\).
+
+These estimates indicate that unusually active trading hours
+tend to be followed by higher next-hour log realized variance,
+conditional on volatility measured at the four HAR horizons.
+
+The result is consistent with the interpretation of trade
+count as a proxy for information arrival and market attention.
+It is related to the mixture-of-distributions framework of
+\citet{clark1973} and the transaction-count evidence reported
+by \citet{jones1994}. Increased activity may reflect periods
+in which market participants are processing new information
+and adjusting positions more intensively.
+
+The estimated coefficient represents a conditional predictive
+association. Trading activity and volatility may respond
+jointly to latent information or broader changes in market
+conditions, so the model does not identify a causal effect.
+
+\subsection{Downside Semivariance}
+
+Downside semivariance is statistically insignificant in the
+fixed HAR-X model, and its time-varying coefficient changes
+sign during validation.
+
+Realized semivariance separates the contributions of negative
+and positive intraday returns to total variation
+\citep{barndorffnielsen2010}. In the present specification,
+total realized variance and the current-hour HAR component
+already contain the squared magnitudes of both positive and
+negative returns. Downside semivariance must therefore provide
+information beyond the overall volatility level to obtain a
+distinct effect.
+
+The estimates suggest that this additional contribution is
+small on average at the one-hour forecast horizon. The
+logarithmic transformation may also reduce the influence of a
+limited number of extreme downside observations. The
+time-varying estimates do not reveal a persistent positive or
+negative relationship.
+
+\subsection{Aggressive-Buying Proxy}
+
+The aggressive-buying proxy has a coefficient close to zero in
+the fixed model and changes sign in the TVP specification.
+
+The signed measure records the balance between taker-initiated
+buying and selling. Large imbalances in either direction may
+coincide with elevated volatility, which can weaken the average
+linear effect of a signed variable.
+
+An absolute or nonlinear imbalance measure could capture this
+possibility more directly. Such alternatives were not included
+in the pre-specified model and would require evaluation on a
+new holdout sample.
+
+The weak result may also reflect the information available in
+candlestick data. Aggregated taker-buy volume does not capture
+order-book depth, bid--ask spreads, cancellations, or
+trade-level price impact.
+
+\subsection{Time-Varying Coefficient Patterns}
+
+The state estimates reveal substantial differences in
+coefficient stability across predictors.
+
+The six-hour and twenty-four-hour volatility coefficients
+remain positive and vary within relatively narrow ranges,
+indicating stable short- and medium-horizon persistence during
+validation.
+
+The weekly coefficient fluctuates around zero, suggesting that
+the incremental contribution of longer-horizon volatility
+changes across market conditions. The downside-semivariance
+and aggressive-buying coefficients also cross zero and display
+limited average effects.
+
+Trading activity remains positive throughout validation,
+although its magnitude changes over time. Its predictive
+contribution is therefore persistent within this period but
+not constant.
+
+The state paths provide evidence that some components of the
+forecasting relationship are more stable than others.
+Short- and medium-horizon volatility persistence is relatively
+stable, while weekly and directional effects display greater
+variation. These patterns supplement the forecast comparison
+by showing how the conditional relationships evolve over time.
+
+\subsection{Stationarity and Parameter Variation}
+
+The ADF and KPSS results provide complementary evidence on the
+behavior of hourly log realized variance. The ADF test rejects
+a unit root, supporting the mean-reverting structure captured
+by AR(24). The KPSS test rejects global level stationarity
+\citep{kpss1992}, indicating that the level or dependence
+structure may vary over longer periods.
+
+This evidence is consistent with previous findings that
+structural breaks affect Bitcoin volatility forecasting
+\citep{shen2020}. It also provides a statistical motivation
+for allowing gradual coefficient variation in the HAR-X
+relationship.
+
+TVP-HAR-X retains the mean-reverting dependence represented by
+the HAR components while permitting their coefficients to
+evolve. The state-space specification therefore accommodates
+parameter instability within an otherwise persistent
+volatility process.
+
+\subsection{Residual Dependence}
+
+Ljung--Box portmanteau tests reject residual white noise for
+AR(24), Fixed HAR-X, and TVP-HAR-X
+\citep{ljungbox1978}. None of the specifications fully captures
+the temporal dependence in hourly volatility.
+
+The remaining correlation may reflect long-memory behavior,
+intraday seasonality, nonlinear responses, omitted market
+variables, or changes in conditional variance. However,
+first-order residual and innovation autocorrelations are close
+to zero. For TVP-HAR-X, the lag-one autocorrelation of the
+standardized innovations is approximately \(0.0007\).
+
+Given the large diagnostic samples, small correlations
+distributed across several lags can produce statistically
+significant portmanteau statistics. The residual diagnostics
+therefore indicate model incompleteness, while the
+out-of-sample results remain informative for relative forecast
+comparison.
+
+\subsection{Statistical and Practical Significance}
+
+The HAC loss-differential tests show that TVP-HAR-X reduces
+absolute and squared error relative to Fixed HAR-X. The
+improvements are \(1.33\%\) for absolute error and \(1.87\%\)
+for squared error, with one-sided \(p\)-values below \(0.001\).
+
+These gains are statistically precise but modest in magnitude.
+Their practical relevance depends on the application. Small
+improvements may accumulate when forecasts are generated
+hourly and used repeatedly for risk limits, margin
+calculations, or position sizing. In settings where
+implementation simplicity is more important, the additional
+estimation and monitoring required by the state-space model may
+outweigh the reduction in average error.
+
+Fixed HAR-X is simpler to estimate and deploy, while
+TVP-HAR-X provides lower log-scale forecast errors and
+information about changes in predictor importance. Model choice
+therefore depends on the relevant loss function and the value
+assigned to adaptability.
+
+\subsection{Empirical Design}
+
+Several features of the design strengthen the forecast
+comparison. The sample is divided chronologically, and all
+preprocessing parameters are estimated from the training
+period. Model selection is completed using validation data
+before the final test sample is evaluated.
+
+All models are compared on identical forecast timestamps.
+State-space forecasts are generated sequentially, with each
+realized outcome entering the filter only after the
+corresponding forecast has been produced.
+
+Fixed HAR-X and TVP-HAR-X use the same predictor set, so their
+performance difference reflects coefficient variation rather
+than unequal observable information. Forecast-loss comparisons
+also use HAC standard errors to account for serial dependence
+and heteroskedasticity.
+
+These procedures reduce the scope for data leakage and ensure
+that the reported loss differences arise from the model
+specifications evaluated under common conditions.
+
+\subsection{Limitations}
+
+\subsubsection{Single Market and Contract}
+
+The analysis is based on the Binance BTCUSDT USD-margined
+perpetual futures contract. The results may differ for Bitcoin
+spot markets, other exchanges, alternative cryptocurrency
+assets, or less liquid contracts. Exchange-specific trading
+mechanisms and participant composition may affect both market
+activity and volatility dynamics.
+
+\subsubsection{Single Forecast Horizon}
+
+The study considers only one-hour-ahead volatility. Predictor
+importance and model rankings may change at shorter or longer
+horizons. Order-flow variables may be more informative over
+several minutes, while longer-horizon volatility components
+may contribute more to multi-hour or daily forecasts.
+
+\subsubsection{Limited Microstructure Information}
+
+The available data include candlestick volume, trade count, and
+taker-buy volume, but exclude the complete limit order book.
+Bid--ask spreads, market depth, cancellations, liquidations,
+price impact, open interest, and funding conditions are not
+observed directly.
+
+The market microstructure variables used here should therefore
+be interpreted as aggregate high-frequency trading proxies.
+
+\subsubsection{Linear Predictor Effects}
+
+Both HAR-X specifications impose linear effects in the
+observation equation. The relationship between activity and
+future volatility may be nonlinear, particularly during
+extreme market conditions.
+
+A signed aggressive-buying measure may also understate the
+effect of order-flow imbalance when both strong buying and
+strong selling are associated with elevated volatility.
+Nonlinear and absolute-imbalance terms would require
+pre-specification and evaluation on a new holdout sample.
+
+\subsubsection{Restricted State Covariance}
+
+All seven time-varying slope coefficients share the common
+state innovation variance \(q_{\beta}\). This restriction
+improves parsimony and numerical stability but imposes a common
+prior rate of variation across predictor effects.
+
+Separate state variances could allow trading activity,
+short-horizon volatility, and weekly volatility coefficients
+to evolve at different rates. Such a specification would add
+hyperparameters and may increase estimation uncertainty.
+
+\subsubsection{Retransformation from Log Variance}
+
+The models forecast log realized variance, and the variance
+forecast used in QLIKE is obtained as
+
+\[
+\widehat{RV}_t
+=
+\exp
+\left(
+\widehat{y}_t
+\right).
+\]
+
+In general,
+
+\[
+E
+\left[
+RV_t
+\mid
+\mathcal{F}_{t-1}
+\right]
+\neq
+\exp
+\left(
+E
+\left[
+\log RV_t
+\mid
+\mathcal{F}_{t-1}
+\right]
+\right).
+\]
+
+The direct exponential transformation is closer to a
+conditional median than to a conditional mean when log
+forecast errors have positive variance. The same
+transformation is applied to every model, preserving internal
+comparability. Future work could evaluate lognormal or
+nonparametric bias corrections for variance-scale forecasting.
+
+\subsubsection{Seasonality and Long-Memory Structure}
+
+The feature set contains six-hour, daily, and weekly volatility
+averages but no explicit hour-of-day or day-of-week indicators.
+Continuous cryptocurrency trading may still display seasonal
+patterns associated with participation across geographic
+regions.
+
+The significant long-horizon Ljung--Box statistics also
+suggest that additional seasonal or long-memory dependence
+remains.
+
+\subsection{Directions for Further Research}
+
+The analysis can be extended in several directions. Applying
+the same design to multiple contracts and exchanges would show
+whether the predictive value of trading activity generalizes
+across markets. Evaluating several forecast horizons would
+clarify how the importance of HAR components and activity
+variables changes with the prediction interval.
+
+Richer high-frequency predictors could include order-book
+depth, bid--ask spreads, liquidation volume, open interest, and
+funding rates. Nonlinear transformations of trade count and
+order-flow imbalance may also capture effects missed by the
+linear specification.
+
+Alternative state dynamics provide another extension.
+Mean-reverting coefficients or regime-switching models may be
+appropriate when forecasting relationships alternate among
+recurring market states. Forecast combinations could also
+exploit the relative stability of Fixed HAR-X and the adaptive
+behavior of TVP-HAR-X.
+
+Any extension informed by the present test results would
+require a new validation period and an untouched final holdout
+sample.

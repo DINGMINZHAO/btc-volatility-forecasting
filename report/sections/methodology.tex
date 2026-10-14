@@ -1,0 +1,778 @@
+\subsection{Modeling Strategy}
+
+The empirical analysis compares four models of increasing
+flexibility. Each specification adds a distinct source of
+predictive information or parameter variation:
+
+\[
+\text{Persistence}
+\;\longrightarrow\;
+\text{AR}
+\;\longrightarrow\;
+\text{Fixed HAR-X}
+\;\longrightarrow\;
+\text{TVP-HAR-X}.
+\]
+
+The persistence benchmark uses only current-hour volatility.
+The autoregressive model estimates a flexible pattern of
+short-run lag dependence. Fixed HAR-X replaces individual lags
+with multi-horizon volatility summaries and supplements them
+with market-activity variables. TVP-HAR-X retains the same
+predictors while allowing their coefficients to evolve over
+time.
+
+This sequence separates three potential sources of forecast
+improvement:
+
+\begin{enumerate}[label=(\roman*)]
+    \item persistence beyond the current hour;
+    \item multi-horizon volatility and market-activity
+    information;
+    \item time variation in predictor coefficients.
+\end{enumerate}
+
+Table~\ref{tab:model-roles} summarizes the role of each model.
+
+\begin{table}[H]
+\centering
+\caption{Forecasting models and their empirical roles}
+\label{tab:model-roles}
+\begin{tabular}{p{3.0cm}p{4.2cm}p{6.0cm}}
+\toprule
+Model
+& Main information
+& Empirical question \\
+\midrule
+Persistence
+& Current-hour volatility
+& Does the current volatility level provide an adequate
+one-hour-ahead forecast? \\
+
+AR(24)
+& Twenty-four hourly lags
+& Does a flexible short-run lag structure improve forecast
+accuracy? \\
+
+Fixed HAR-X
+& Multi-horizon volatility and market-activity features
+& Do structured long-horizon summaries and current market
+conditions add predictive information? \\
+
+TVP-HAR-X
+& The HAR-X predictor set with evolving coefficients
+& Does gradual coefficient variation improve forecasts relative
+to a fixed relationship? \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Persistence Benchmark}
+
+The persistence forecast is
+
+\begin{equation}
+\widehat{y}_{t+1|t}^{\mathrm{Naive}}
+=
+y_t.
+\label{eq:naive-model}
+\end{equation}
+
+On the original variance scale, this implies
+\(\widehat{RV}_{t+1|t}^{\mathrm{Naive}}=RV_t\).
+
+Volatility persistence makes this a relevant benchmark for
+short-horizon forecasting. The model contains no estimated
+parameters and represents the performance available from the
+most recent observed volatility alone.
+
+\subsection{Fixed-Parameter Autoregressive Model}
+
+The general one-hour-ahead AR(\(p\)) model is
+
+\begin{equation}
+y_{t+1}
+=
+c
++
+\sum_{j=1}^{p}
+\phi_j y_{t-j+1}
++
+\varepsilon_{t+1},
+\label{eq:ar-model}
+\end{equation}
+
+where \(c\) is an intercept, \(\phi_j\) is the coefficient on
+lag \(j\), and \(\varepsilon_{t+1}\) is a zero-mean forecast
+disturbance.
+
+Under this indexing convention,
+
+\[
+y_{t-j+1}
+=
+\begin{cases}
+y_t, & j=1,\\
+y_{t-1}, & j=2,\\
+\vdots\\
+y_{t-p+1}, & j=p.
+\end{cases}
+\]
+
+The corresponding forecast is
+
+\begin{equation}
+\widehat{y}_{t+1|t}^{\mathrm{AR}(p)}
+=
+\widehat{c}
++
+\sum_{j=1}^{p}
+\widehat{\phi}_j y_{t-j+1}.
+\label{eq:ar-forecast}
+\end{equation}
+
+The persistence benchmark is obtained from the restrictions
+\(c=0\) and \(\phi_1=1\). Estimating the coefficients allows
+the model to capture mean reversion and distribute predictive
+weight across several recent hours.
+
+\subsubsection{Stationarity Assessment}
+
+The AR analysis begins with an assessment of the training-period
+log realized-variance series. The graphical diagnostics include
+the series itself, a 168-hour rolling mean, a 168-hour rolling
+standard deviation, the autocorrelation function, and the
+partial autocorrelation function.
+
+The augmented Dickey--Fuller test accommodates higher-order
+serial dependence through lagged differences
+\citep{saiddickey1984}. Its null hypothesis is
+
+\[
+H_0^{\mathrm{ADF}}:
+\text{the series contains a unit root}.
+\]
+
+The KPSS test uses level stationarity as the null hypothesis
+\citep{kpss1992}:
+
+\[
+H_0^{\mathrm{KPSS}}:
+\text{the series is level stationary}.
+\]
+
+The two tests provide complementary evidence. Joint rejection
+can arise when a series is mean reverting but exhibits changes
+in its level or dependence structure over long periods.
+
+Formal tests are applied to the longest continuous valid
+training segment. This avoids closing gaps by treating
+nonadjacent observations as consecutive.
+
+\subsubsection{Order Selection and Estimation}
+
+Candidate orders are restricted to
+\(p\in\{1,2,\ldots,24\}\). The upper bound covers one complete
+day of hourly dependence while limiting the number of estimated
+parameters.
+
+Each candidate model is estimated by ordinary least squares on
+the training sample. AIC and BIC are reported as in-sample
+diagnostics, while validation QLIKE determines the selected
+order. Validation RMSE and MAE serve as secondary criteria.
+
+The procedure selects \(p=24\), yielding
+
+\begin{equation}
+y_{t+1}
+=
+c
++
+\sum_{j=1}^{24}
+\phi_j y_{t-j+1}
++
+\varepsilon_{t+1}.
+\label{eq:ar24-model}
+\end{equation}
+
+Dynamic stability is assessed through the roots of the
+characteristic polynomial
+
+\begin{equation}
+1
+-
+\phi_1 z
+-
+\phi_2 z^2
+-
+\cdots
+-
+\phi_{24} z^{24}
+=
+0.
+\label{eq:ar-characteristic-polynomial}
+\end{equation}
+
+The model is stable when all roots lie outside the unit circle.
+Residual dependence is evaluated using autocorrelations and
+Ljung--Box statistics at several horizons.
+
+AR(24) serves as the principal fixed-lag benchmark for the
+subsequent HAR-X comparisons.
+
+\subsection{The HAR-X Specification}
+
+AR(24) estimates a separate coefficient for each of the
+previous 24 hourly observations and contains no direct summary
+of volatility beyond one day. The HAR framework represents
+persistent volatility through aggregated components measured
+over several horizons \citep{corsi2009}.
+
+The volatility predictor vector is
+
+\[
+\mathbf{h}_t
+=
+\begin{bmatrix}
+HAR^{(1)}_t \\
+HAR^{(6)}_t \\
+HAR^{(24)}_t \\
+HAR^{(168)}_t
+\end{bmatrix}.
+\]
+
+The one-hour and six-hour components describe recent
+conditions, while the 24-hour and 168-hour components summarize
+daily and weekly volatility. This construction compresses the
+lag history into four interpretable variables and avoids
+estimating a separate coefficient for every hourly lag.
+
+Three market-activity predictors are added:
+
+\[
+\mathbf{m}_t
+=
+\begin{bmatrix}
+DS_t \\
+Trades_t \\
+Buy_t
+\end{bmatrix}.
+\]
+
+Trading activity is motivated by the relationship between
+information arrival, transaction intensity, and price
+variability \citep{clark1973,jones1994}. Downside realized
+semivariance measures variation generated by negative
+intraday returns \citep{barndorffnielsen2010}. The
+aggressive-buying proxy summarizes the direction of
+taker-initiated volume.
+
+These variables are derived from aggregated candlestick data.
+They represent market-activity and order-flow proxies rather
+than direct measures of bid--ask spreads, market depth, or
+other limit-order-book conditions.
+
+\subsection{Fixed HAR-X Model}
+
+Let the standardized predictor vector be
+
+\begin{equation}
+\mathbf{x}_t
+=
+\begin{bmatrix}
+1 \\
+z_{HAR^{(1)},t} \\
+z_{HAR^{(6)},t} \\
+z_{HAR^{(24)},t} \\
+z_{HAR^{(168)},t} \\
+z_{DS,t} \\
+z_{Trades,t} \\
+z_{Buy,t}
+\end{bmatrix}.
+\label{eq:harx-design-vector}
+\end{equation}
+
+The first element is an intercept, and the remaining variables
+are standardized using training-sample moments.
+
+The fixed-parameter HAR-X model is
+
+\begin{equation}
+y_{t+1}
+=
+\mathbf{x}_t^{\mathsf{T}}
+\boldsymbol{\beta}
++
+\varepsilon_{t+1},
+\qquad
+\varepsilon_{t+1}
+\sim
+\mathcal{N}(0,H),
+\label{eq:fixed-harx-vector}
+\end{equation}
+
+with coefficient vector
+
+\[
+\boldsymbol{\beta}
+=
+\begin{bmatrix}
+\mu &
+\beta_1 &
+\beta_6 &
+\beta_{24} &
+\beta_{168} &
+\beta_{DS} &
+\beta_{Trades} &
+\beta_{Buy}
+\end{bmatrix}^{\mathsf{T}}.
+\]
+
+Equivalently,
+
+\begin{align}
+y_{t+1}
+={}&
+\mu
++
+\beta_1 z_{HAR^{(1)},t}
++
+\beta_6 z_{HAR^{(6)},t}
++
+\beta_{24} z_{HAR^{(24)},t}
+\nonumber\\
+&+
+\beta_{168} z_{HAR^{(168)},t}
++
+\beta_{DS} z_{DS,t}
++
+\beta_{Trades} z_{Trades,t}
++
+\beta_{Buy} z_{Buy,t}
++
+\varepsilon_{t+1}.
+\label{eq:fixed-harx-expanded}
+\end{align}
+
+The coefficients are estimated by ordinary least squares.
+Their interpretation is conditional on the remaining
+predictors. The HAR terms measure incremental dependence at
+different volatility horizons, while the three additional
+variables capture information associated with the composition
+and intensity of current market activity.
+
+Coefficient inference uses Newey--West
+heteroskedasticity- and autocorrelation-consistent standard
+errors with 24 lags \citep{neweywest1987}. These standard
+errors affect inference but leave the OLS coefficient estimates
+and forecasts unchanged.
+
+Fixed HAR-X provides the benchmark for evaluating the value of
+time-varying coefficients under an identical observable
+information set.
+
+\subsection{Motivation for Time-Varying Parameters}
+
+Fixed HAR-X imposes a constant coefficient vector,
+\(\boldsymbol{\beta}_t=\boldsymbol{\beta}\), throughout the
+sample. This restriction may be strong for Bitcoin markets,
+where volatility conditions, participation, and trading
+activity can change substantially. Previous evidence also
+shows that jumps and structural breaks affect Bitcoin
+volatility forecasts \citep{shen2020}.
+
+A constant coefficient summarizes the average predictive
+relationship over the estimation period. When that
+relationship changes, a fixed model may adjust slowly and
+combine observations generated under different market
+conditions.
+
+TVP-HAR-X treats the coefficient vector as a latent dynamic
+state. Coefficients evolve gradually as new forecast errors
+alter the estimated state distribution. This structure permits
+adaptation while preserving continuity between adjacent
+forecast origins.
+
+\subsection{TVP-HAR-X State-Space Model}
+
+TVP-HAR-X uses the same observable predictors as Fixed HAR-X
+and allows their coefficients to vary over time. The model is
+written in state-space form, linking the observed target to a
+latent coefficient vector \citep{durbin2012}.
+
+The observation equation is
+
+\begin{equation}
+y_{t+1}
+=
+\mathbf{x}_t^{\mathsf{T}}
+\boldsymbol{\beta}_t
++
+\varepsilon_{t+1},
+\qquad
+\varepsilon_{t+1}
+\sim
+\mathcal{N}(0,H).
+\label{eq:tvp-observation}
+\end{equation}
+
+The state vector is
+
+\begin{equation}
+\boldsymbol{\beta}_t
+=
+\begin{bmatrix}
+\mu_t \\
+\beta_{1,t} \\
+\beta_{6,t} \\
+\beta_{24,t} \\
+\beta_{168,t} \\
+\beta_{DS,t} \\
+\beta_{Trades,t} \\
+\beta_{Buy,t}
+\end{bmatrix}.
+\label{eq:tvp-state-vector}
+\end{equation}
+
+Its transition equation is a random walk:
+
+\begin{equation}
+\boldsymbol{\beta}_{t+1}
+=
+\boldsymbol{\beta}_t
++
+\boldsymbol{\eta}_{t+1},
+\qquad
+\boldsymbol{\eta}_{t+1}
+\sim
+\mathcal{N}
+\left(
+\mathbf{0},
+\mathbf{Q}
+\right).
+\label{eq:tvp-state-transition}
+\end{equation}
+
+The state covariance matrix is restricted to
+
+\begin{equation}
+\mathbf{Q}
+=
+\operatorname{diag}
+\left(
+q_{\mu},
+q_{\beta},
+q_{\beta},
+q_{\beta},
+q_{\beta},
+q_{\beta},
+q_{\beta},
+q_{\beta}
+\right).
+\label{eq:tvp-state-covariance}
+\end{equation}
+
+The intercept has innovation variance \(q_{\mu}\), and the
+seven slope coefficients share \(q_{\beta}\). This restriction
+reduces the variance parameters to \(H\), \(q_{\mu}\), and
+\(q_{\beta}\), providing a parsimonious specification of
+coefficient variation.
+
+The state variances govern the rate of adaptation. Values close
+to zero produce slowly changing coefficients, while larger
+values permit faster responses to new observations. All three
+variance parameters are estimated from the data.
+
+\subsection{Kalman Filtering and Sequential Forecasting}
+
+Conditional on the variance parameters, TVP-HAR-X is a linear
+Gaussian state-space model. The Kalman filter recursively
+produces forecasts and updates the conditional distribution of
+the latent coefficients \citep{kalman1960,durbin2012}.
+
+Let
+
+\begin{equation}
+\mathbf{a}_{t|t-1}
+=
+E
+\left[
+\boldsymbol{\beta}_t
+\mid
+\mathcal{F}_{t-1}
+\right]
+\label{eq:predicted-state}
+\end{equation}
+
+denote the predicted state, with covariance
+
+\begin{equation}
+\mathbf{P}_{t|t-1}
+=
+\operatorname{Var}
+\left(
+\boldsymbol{\beta}_t
+\mid
+\mathcal{F}_{t-1}
+\right).
+\label{eq:predicted-state-covariance}
+\end{equation}
+
+Under the random-walk transition,
+
+\begin{equation}
+\mathbf{a}_{t|t-1}
+=
+\mathbf{a}_{t-1|t-1},
+\label{eq:kalman-state-prediction}
+\end{equation}
+
+and
+
+\begin{equation}
+\mathbf{P}_{t|t-1}
+=
+\mathbf{P}_{t-1|t-1}
++
+\mathbf{Q}.
+\label{eq:kalman-covariance-prediction}
+\end{equation}
+
+The one-hour-ahead forecast is
+
+\begin{equation}
+\widehat{y}_{t+1|t}
+=
+\mathbf{x}_t^{\mathsf{T}}
+\mathbf{a}_{t|t-1},
+\label{eq:kalman-observation-forecast}
+\end{equation}
+
+with conditional forecast variance
+
+\begin{equation}
+F_t
+=
+\mathbf{x}_t^{\mathsf{T}}
+\mathbf{P}_{t|t-1}
+\mathbf{x}_t
++
+H.
+\label{eq:kalman-forecast-variance}
+\end{equation}
+
+After \(y_{t+1}\) becomes available, the forecast innovation is
+
+\begin{equation}
+v_t
+=
+y_{t+1}
+-
+\widehat{y}_{t+1|t},
+\label{eq:kalman-innovation}
+\end{equation}
+
+and the Kalman gain is
+
+\begin{equation}
+\mathbf{K}_t
+=
+\frac{
+\mathbf{P}_{t|t-1}
+\mathbf{x}_t
+}{
+F_t
+}.
+\label{eq:kalman-gain}
+\end{equation}
+
+The filtered state and covariance are updated according to
+
+\begin{equation}
+\mathbf{a}_{t|t}
+=
+\mathbf{a}_{t|t-1}
++
+\mathbf{K}_t v_t,
+\label{eq:kalman-state-update}
+\end{equation}
+
+and
+
+\begin{equation}
+\mathbf{P}_{t|t}
+=
+\mathbf{P}_{t|t-1}
+-
+\mathbf{K}_t
+\mathbf{x}_t^{\mathsf{T}}
+\mathbf{P}_{t|t-1}.
+\label{eq:kalman-covariance-update}
+\end{equation}
+
+The magnitude of each update depends on the forecast
+innovation, state uncertainty, predictor values, and
+observation variance. The filter therefore regulates
+coefficient adjustment through the Kalman gain.
+
+\subsection{Missing Observations}
+
+Invalid target hours remain on the hourly calendar. During
+such an hour, the state prediction proceeds according to
+
+\[
+\mathbf{a}_{t|t-1}
+=
+\mathbf{a}_{t-1|t-1},
+\qquad
+\mathbf{P}_{t|t-1}
+=
+\mathbf{P}_{t-1|t-1}
++
+\mathbf{Q}.
+\]
+
+Because no valid target is observed, the measurement update is
+omitted:
+
+\[
+\mathbf{a}_{t|t}
+=
+\mathbf{a}_{t|t-1},
+\qquad
+\mathbf{P}_{t|t}
+=
+\mathbf{P}_{t|t-1}.
+\]
+
+This treatment preserves elapsed calendar time across missing
+hours.
+
+\subsection{Parameter Estimation}
+
+The initial state mean is set to the Fixed HAR-X coefficient
+estimate. The initial covariance is
+
+\begin{equation}
+\mathbf{P}_0
+=
+0.25\mathbf{I}_8,
+\label{eq:initial-state-covariance}
+\end{equation}
+
+where \(\mathbf{I}_8\) is the \(8\times8\) identity matrix.
+
+The variance-parameter vector is
+\(\boldsymbol{\theta}=(H,q_{\mu},q_{\beta})^{\mathsf{T}}\).
+It is estimated by maximizing the Kalman-filter
+prediction-error likelihood \citep{durbin2012}.
+
+Conditional on information available before observation \(t\),
+
+\begin{equation}
+v_t
+\sim
+\mathcal{N}(0,F_t).
+\label{eq:innovation-distribution}
+\end{equation}
+
+Ignoring constants, the log likelihood is
+
+\begin{equation}
+\ell
+\left(
+\boldsymbol{\theta}
+\right)
+=
+-\frac{1}{2}
+\sum_{t \in \mathcal{T}_{\mathrm{valid}}}
+\left[
+\log(F_t)
++
+\frac{v_t^2}{F_t}
+\right],
+\label{eq:kalman-log-likelihood}
+\end{equation}
+
+where \(\mathcal{T}_{\mathrm{valid}}\) contains observations
+with valid targets.
+
+Positivity is imposed through exponential transformations of
+the variance parameters. Optimization is performed from
+several initial values, and the converged solution with the
+highest likelihood is retained.
+
+During model development, the variance parameters are estimated
+on the training sample and evaluated sequentially on
+validation data. After the specification is fixed, they are
+re-estimated using the combined training and validation
+period for the final test forecasts.
+
+\subsection{Interpretation of the Time-Varying Coefficients}
+
+The estimated state paths describe conditional predictive
+associations. Causal interpretation lies outside the scope of
+the model.
+
+For example, a positive value of \(\beta_{Trades,t}\) indicates
+that higher trading activity is associated with higher
+next-hour log realized variance at time \(t\), conditional on
+the remaining predictors. Changes in \(\beta_{1,t}\) and
+\(\beta_{168,t}\) describe variation in the relative
+predictive importance of recent and weekly volatility.
+
+The state estimates are used to assess coefficient stability,
+identify predictors with substantial temporal variation, and
+compare their behavior across market conditions.
+
+\subsection{Model Diagnostics}
+
+AR(24) diagnostics include characteristic roots, residual
+autocorrelations, and Ljung--Box portmanteau statistics
+\citep{ljungbox1978}.
+
+For Fixed HAR-X, the analysis reports the residual mean,
+variance, first-order autocorrelation, Durbin--Watson
+statistic, and Ljung--Box statistics.
+
+TVP-HAR-X diagnostics use standardized one-step-ahead
+innovations,
+
+\begin{equation}
+u_t
+=
+\frac{v_t}{\sqrt{F_t}}.
+\label{eq:standardized-innovation}
+\end{equation}
+
+Under the linear Gaussian specification, these innovations
+should have approximately zero mean, unit variance, and limited
+serial correlation.
+
+Because the diagnostic samples are large, small residual
+correlations may produce statistically significant
+portmanteau tests. The test results are interpreted jointly
+with residual magnitudes, short-lag autocorrelations, and
+out-of-sample forecast performance.
+
+\subsection{Final Model Comparison}
+
+Model selection is conducted using the training and validation
+periods. The selected AR(24), Fixed HAR-X, and TVP-HAR-X
+specifications are then re-estimated on the combined
+development sample and evaluated on the same 2025 test
+timestamps.
+
+The comparison addresses three questions:
+
+\begin{enumerate}[label=(\arabic*)]
+    \item Does AR(24) improve on volatility persistence?
+    \item Does Fixed HAR-X improve on AR(24) through
+    multi-horizon and market-activity information?
+    \item Does coefficient variation improve on Fixed HAR-X
+    under an identical predictor set?
+\end{enumerate}
+
+The final comparison isolates the contribution of parameter
+variation because Fixed HAR-X and TVP-HAR-X use the same
+observable information.

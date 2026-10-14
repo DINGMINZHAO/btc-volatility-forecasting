@@ -1,0 +1,78 @@
+\section{Reproducibility}
+
+\subsection{Software Environment}
+
+The empirical analysis was conducted in Python 3.11.15 using
+the Conda environment \texttt{btc-volatility}. The complete
+dependency specification is provided in
+\texttt{environment.yml}.
+
+The principal packages are \texttt{pandas} and \texttt{numpy}
+for data processing and numerical computation,
+\texttt{pyarrow} for Parquet input and output,
+\texttt{statsmodels} for regression estimation, HAC inference,
+and time-series diagnostics, \texttt{scikit-learn} for
+supporting preprocessing operations, and \texttt{matplotlib}
+for figure generation. The data-acquisition scripts also use
+\texttt{requests} and \texttt{tqdm}.
+
+The environment can be reconstructed from the project root
+using
+
+\begin{verbatim}
+conda env create -f environment.yml
+conda activate btc-volatility
+\end{verbatim}
+
+\subsection{Execution Procedure}
+
+The report is accompanied by a code archive containing the
+source files, environment specification, and a
+\texttt{README.md} file. The README documents the Binance data
+source, required directory structure, complete execution order,
+and expected output files. The original data can be retrieved
+from the public source using the included download and
+extraction scripts.
+
+After data acquisition and preprocessing, the principal
+analysis scripts are executed from the project root in the
+following order:
+
+\begin{verbatim}
+python src/evaluate_naive_baseline.py
+python src/run_complete_ar_analysis.py
+python src/run_fixed_harx_analysis.py
+python src/run_tvp_harx_analysis.py
+python src/run_final_test_evaluation.py
+python src/create_final_report_outputs.py
+\end{verbatim}
+
+These scripts respectively generate the persistence forecasts,
+select and evaluate the autoregressive model, estimate the
+fixed HAR-X model, estimate the TVP-HAR-X state-space model,
+perform the locked final test evaluation, and produce the
+tables and figures used in the report.
+
+Scripts whose filenames begin with \texttt{download},
+\texttt{extract}, and \texttt{inspect} handle data acquisition,
+archive extraction, and preliminary data-quality inspection.
+Detailed commands for these preprocessing stages are provided
+in \texttt{README.md}.
+
+\subsection{Reproducibility Controls}
+
+All timestamps are processed in UTC, and lagged variables are
+constructed on the complete hourly calendar. Transformation
+and standardization parameters are estimated from the training
+sample and then held fixed.
+
+Model and hyperparameter selection uses the validation period.
+The 2025 test sample is evaluated only after the model
+specifications have been fixed. All models are compared on the
+same set of forecast timestamps, and the state-space forecasts
+are generated sequentially without using future observations.
+
+Generated numerical results, tables, and figures are written
+to the \texttt{outputs} directory. Running the documented
+pipeline reconstructs the empirical outputs reported in the
+main text.

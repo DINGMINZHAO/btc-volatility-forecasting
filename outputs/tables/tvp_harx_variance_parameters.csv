@@ -1,0 +1,4 @@
+parameter,value,standard_deviation,estimated_from
+observation_variance,0.749183036796485,0.865553601342219,train
+intercept_state_variance,2.5405901482825605e-05,0.005040426716343131,train
+slope_state_variance,1.6680515096479825e-06,0.0012915306847489077,train

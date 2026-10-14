@@ -1,0 +1,34 @@
+# Raw and processed market data are downloaded/generated locally.
+/data/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+
+# macOS and editors
+.DS_Store
+._*
+.vscode/
+.idea/
+
+# Temporary/download artifacts
+*.part
+*.tmp
+
+# LaTeX build artifacts (keep report/main.pdf)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.synctex.gz

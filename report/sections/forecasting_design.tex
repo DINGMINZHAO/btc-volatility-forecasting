@@ -1,0 +1,270 @@
+\subsection{One-Hour-Ahead Forecasting Problem}
+
+Let \(\tau\) denote the forecast origin and
+\(\mathcal{F}_{\tau}\) the information available at that time.
+The target is next-hour log realized variance,
+\(y_{\tau+1}=\log(RV_{\tau+1})\). Each model produces the
+conditional forecast
+
+\begin{equation}
+\widehat{y}_{\tau+1|\tau}
+=
+E
+\left[
+y_{\tau+1}
+\mid
+\mathcal{F}_{\tau}
+\right].
+\label{eq:forecast-objective}
+\end{equation}
+
+For a forecast issued at 12:00 UTC, the predictors use
+information observed by 12:00 UTC and the target is realized
+variance from 12:00 to 13:00 UTC.
+
+Lagged variables and rolling averages are constructed on the
+complete hourly calendar before model-ready observations are
+selected. This preserves the calendar interpretation of each
+lag and rolling window when invalid hours occur.
+
+\subsection{Chronological Sample Division}
+
+The sample is divided chronologically into training,
+validation, and test periods.
+
+\begin{table}[H]
+\centering
+\caption{Chronological forecasting design}
+\label{tab:forecasting-splits}
+\begin{tabular}{lll}
+\toprule
+Sample & Period & Purpose \\
+\midrule
+Training
+& January 2022--December 2023
+& Estimation and preprocessing \\
+
+Validation
+& January 2024--December 2024
+& Model and hyperparameter selection \\
+
+Test
+& January 2025--December 2025
+& Final out-of-sample evaluation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The training sample determines preprocessing parameters and
+initial model estimates. The downside-semivariance scale and
+feature-standardization parameters are estimated exclusively
+from this period.
+
+The validation sample is used to select the autoregressive
+order and evaluate the fixed and time-varying specifications.
+After the model structures are fixed, the selected models are
+re-estimated using the combined training and validation
+sample. The 2025 observations are reserved for the final
+evaluation.
+
+\subsection{Common Evaluation Sample}
+
+All models are compared on identical forecast timestamps. An
+observation is retained only when the one-hour-ahead target and
+all predictors required by HAR-X are available.
+
+The common sample contains \(16{,}673\) training observations,
+\(8{,}610\) validation observations, and \(8{,}422\) test
+observations.
+
+Persistence and AR(24) could generate forecasts for additional
+timestamps. Restricting evaluation to the common sample ensures
+that differences in reported losses reflect forecast
+performance under the same market conditions.
+
+\subsection{Sequential Forecasting and Information Control}
+
+The fixed-parameter models use predictor values observed at the
+forecast origin and retain constant coefficient estimates
+throughout each evaluation period.
+
+TVP-HAR-X generates forecasts sequentially. At origin
+\(\tau\), the predicted state produces
+\(\widehat{y}_{\tau+1|\tau}\). Once \(y_{\tau+1}\) becomes
+available, the Kalman filter updates the state distribution for
+the following forecast.
+
+Invalid target hours remain on the state-space calendar as
+missing observations. The state transition continues through
+these hours, while the measurement update is omitted.
+
+\subsection{Model Selection Rules}
+
+The autoregressive order is selected from
+\(p\in\{1,2,\ldots,24\}\). Each candidate model is estimated on
+the training sample and evaluated on the same validation
+timestamps.
+
+Validation QLIKE is the primary selection criterion. Ties are
+resolved sequentially using:
+
+\begin{enumerate}[label=(\roman*)]
+    \item lower validation RMSE;
+    \item lower validation MAE;
+    \item lower autoregressive order.
+\end{enumerate}
+
+Training-sample AIC and BIC are reported as supplementary
+diagnostics. The HAR-X predictor set and TVP-HAR-X state
+specification are fixed before the test evaluation.
+
+\subsection{Mean Absolute Error}
+
+Mean absolute error is calculated on the log
+realized-variance scale:
+
+\begin{equation}
+MAE
+=
+\frac{1}{N}
+\sum_{t=1}^{N}
+\left|
+y_t-\widehat{y}_t
+\right|.
+\label{eq:mae}
+\end{equation}
+
+MAE reports the average absolute forecast error and gives each
+observation a linear contribution to aggregate loss.
+
+\subsection{Root Mean Squared Error}
+
+Root mean squared error is
+
+\begin{equation}
+RMSE
+=
+\sqrt{
+\frac{1}{N}
+\sum_{t=1}^{N}
+\left(
+y_t-\widehat{y}_t
+\right)^2
+}.
+\label{eq:rmse}
+\end{equation}
+
+The squared-error transformation assigns greater weight to
+large forecast errors.
+
+\subsection{QLIKE Loss}
+
+QLIKE is the primary volatility forecast loss. It is suitable
+for comparing forecasts when realized variance is an imperfect
+proxy for latent conditional variance
+\citep{patton2011}.
+
+Let \(RV_t=\exp(y_t)\) and
+\(\widehat{RV}_t=\exp(\widehat{y}_t)\). Observation-level
+QLIKE is
+
+\begin{equation}
+QLIKE_t
+=
+\frac{RV_t}{\widehat{RV}_t}
+-
+\log
+\left(
+\frac{RV_t}{\widehat{RV}_t}
+\right)
+-1.
+\label{eq:qlike-original}
+\end{equation}
+
+On the log scale, the same loss can be written as
+
+\begin{equation}
+QLIKE_t
+=
+\exp
+\left(
+y_t-\widehat{y}_t
+\right)
+-
+\left(
+y_t-\widehat{y}_t
+\right)
+-1.
+\label{eq:qlike-log}
+\end{equation}
+
+Average QLIKE is
+
+\begin{equation}
+QLIKE
+=
+\frac{1}{N}
+\sum_{t=1}^{N}
+QLIKE_t.
+\label{eq:average-qlike}
+\end{equation}
+
+Lower values indicate better performance. QLIKE evaluates
+proportional variance errors and can impose a large penalty
+when high realized variance is substantially underestimated.
+
+\subsection{Forecast Loss Comparison}
+
+The percentage improvement of model \(m\) over benchmark \(b\)
+is
+
+\begin{equation}
+Improvement_{m,b}
+=
+100
+\left(
+\frac{
+L_b-L_m
+}{
+L_b
+}
+\right),
+\label{eq:percentage-improvement}
+\end{equation}
+
+where \(L_b\) and \(L_m\) denote average forecast losses. A
+positive value indicates lower loss for model \(m\).
+
+Predictive accuracy is assessed through the loss-differential
+framework of \citet{dieboldmariano1995}. For TVP-HAR-X and a
+benchmark model \(b\), the loss differential is
+
+\begin{equation}
+d_t
+=
+L_{b,t}
+-
+L_{\mathrm{TVP},t}.
+\label{eq:loss-differential}
+\end{equation}
+
+Positive values favor TVP-HAR-X. The hypotheses are
+
+\[
+H_0:
+E(d_t)\leq 0,
+\qquad
+H_1:
+E(d_t)>0.
+\]
+
+Because forecast losses may be heteroskedastic and serially
+correlated, the mean loss differential is evaluated using
+Newey--West HAC standard errors with 24 lags
+\citep{neweywest1987}. The resulting statistic is interpreted
+as a Diebold--Mariano-type test of equal predictive accuracy.
+
+The pre-specified primary comparison evaluates TVP-HAR-X
+against Fixed HAR-X under QLIKE. Absolute-error and
+squared-error comparisons are reported as supplementary
+evidence.
